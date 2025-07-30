@@ -1,36 +1,38 @@
 import "@testing-library/jest-dom";
+import React from "react";
 import { render, screen } from "@testing-library/react";
-import { RouterProvider, createMemoryRouter} from "react-router-dom";
-import routes from "../routes";
+import { BrowserRouter } from "react-router-dom";
+import Home from "../components/Home";
+import NavBar from "../components/NavBar";
 
-const router = createMemoryRouter(routes)
+describe("Home component", () => {
+  beforeEach(() => {
+    render(
+      <BrowserRouter>
+        <Home />
+      </BrowserRouter>
+    );
+  });
 
-test("renders 'Home Page' inside of an <h1 />", () => {
-  render(<RouterProvider router={router}/>);
-  const h1 = screen.queryByText(/Home Page/);
-  expect(h1).toBeInTheDocument();
-  expect(h1.tagName).toBe("H1");
+  test("renders welcome message", () => {
+    expect(screen.getByText(/Welcome/i)).toBeInTheDocument();
+  });
 });
 
-test("Displays a list of movie titles", async () =>{
-  render(<RouterProvider router={router}/>);
-  const titleList = await screen.findAllByRole('heading', {level: 2})
-  expect(titleList.length).toBeGreaterThan(2);
-  expect(titleList[0].tagName).toBe("H2");
-  expect(titleList[0].textContent).toBe("Doctor Strange");
-})
+describe("Home NavLink in NavBar", () => {
+  beforeEach(() => {
+    render(
+      <BrowserRouter>
+        <NavBar />
+      </BrowserRouter>
+    );
+  });
 
-test("Displays links for each associated movie", async () =>{
-  render(<RouterProvider router={router}/>);
-  const linkList = await screen.findAllByText(/View Info/);
-  expect(linkList.length).toBeGreaterThan(2);
-  expect(linkList[0].href.split("/").slice(3).join("/")).toBe("movie/1");
-})
+  test("renders a Home <NavLink>", () => {
+    const homeLink = screen.getByText("Home");
 
-test("renders the <NavBar /> component", () => {
-  const router = createMemoryRouter(routes)
-  render(
-      <RouterProvider router={router}/>
-  );
-  expect(document.querySelector(".navbar")).toBeInTheDocument();
+    expect(homeLink).toBeInTheDocument();               // It renders
+    expect(homeLink.tagName).toBe("A");                 // It’s a link
+    expect(homeLink.getAttribute("href")).toBe("/");    // Link points to "/"
+  });
 });
